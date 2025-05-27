@@ -138,7 +138,7 @@ def write_limits_to_file() -> None:
 	with open(get_app_times_file_path(), "w") as file:
 		file.write(get_app_limits_as_string())
 
-def get_limit_with_name(app_name: str) -> Limit:
+def get_limit_with_name(app_name: str) -> Limit | None:
 	"""
 	Returns the limit of an app with the name "app_name"
 	:param app_name: The name of the app to search
@@ -149,6 +149,9 @@ def get_limit_with_name(app_name: str) -> Limit:
 		if i.app_name == app_name:
 			return i
 	ValueError(f"Can't find app with name [{app_name}]")
+	return None
+
+
 #endregion
 
 #region Usage

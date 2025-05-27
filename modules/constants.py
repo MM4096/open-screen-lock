@@ -23,4 +23,4 @@ EDIT_LIMITS_HELP_TEXT = (f"{PrintColors.OKGREEN}Edit limits{PrintColors.ENDC}\n\
 						 "`del [item]`: deletes the limit with the index of [item]\n"
 						 "\t- item: the index of the item to delete\n"
 						 "`edit [item]`: edits the limit with an index of [item]\n"
-						 "\t- item: the index of the item to delete\n")
+						 "\t- item: the index of the item to edit\n")

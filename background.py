@@ -30,17 +30,26 @@ def main():
 		current_day = datetime.now().day
 		current_month = datetime.now().month
 		current_year = datetime.now().year
-		with open(get_last_refreshed_date_path(), "r") as f:
-			last_date = float(f.readline())
-			last_month = float(f.readline())
-			last_year = float(f.readline())
+
+		last_date = 0
+		last_month = 0
+		last_year = 0
+
+		try:
+			with open(get_last_refreshed_date_path(), "r") as f:
+				last_date = float(f.readline())
+				last_month = float(f.readline())
+				last_year = float(f.readline())
+		except ValueError:
+			pass
+
 		if current_day > last_date or current_month > last_month or current_year > last_year:
 			for i in app_timer.app_usages:
 				i.time_used = 0
 				write_usage_to_file()
 				with open(get_last_refreshed_date_path(), "w") as f:
 					f.write(f"{current_day}\n{current_month}\n{current_year}")
-			send_notification("Time Limit", "App times reset!")
+			# send_notification("Time Limit", "App times reset!")
 			notified["1800"] = []
 			notified["300"] = []
 
@@ -53,16 +62,16 @@ def main():
 					i.time_used += 1
 					if app_timer.get_time_left(i.app_name) < 1800 and i.app_name not in notified["1800"]:
 						notified["1800"].append(i.app_name)
-						send_notification("Time Limit", f"30 minutes are left for {i.app_name}")
+						# send_notification("Time Limit", f"30 minutes are left for {i.app_name}")
 					elif app_timer.get_time_left(i.app_name) < 300 and i.app_name not in notified["300"]:
 						notified["300"].append(i.app_name)
-						send_notification("Time Limit", f"5 minutes are left for {i.app_name}")
+						# send_notification("Time Limit", f"5 minutes are left for {i.app_name}")
 
 					if app_timer.get_time_left(i.app_name) == 0:
 						i.time_used = this_limit.timer
 
 						for process in get_processes(i.app_name, this_limit.strict_limit):
-							send_notification("App Blocked", f"{i.app_name} has been blocked.")
+							# send_notification("App Blocked", f"{i.app_name} has been blocked.")
 							kill_process(process[0])
 
 

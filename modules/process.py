@@ -16,10 +16,12 @@ def get_processes(filter_str: str = "", use_strict: bool = False) -> list[(str, 
 	ret_arr: list[(str, str)] = []
 	for process in psutil.process_iter(["pid", "name"]):
 		try:
-			if (filter_str == "" or
-				(filter_str in process.info["name"].lower() and not use_strict) or
-				# Don't need to check for `use_strict`.
-				(filter_str.lower() == process.info["name"].lower()) ):
+			if (
+					filter_str == "" or
+					(not use_strict and filter_str.lower() in process.info["name"].lower()) or
+					# Don't need to check for `use_strict`.
+					(use_strict and filter_str.lower() == process.info["name"].lower())
+			):
 				ret_arr.append((process.info["pid"], process.info["name"]))
 		except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
 			pass

@@ -3,14 +3,11 @@ This script manages the settings of the application.
 """
 import os
 
-from notifypy import Notify
-import platformdirs
-
 from modules.app_timer import get_app_limits_as_display_string
 import modules.app_timer as app_timer
 from modules.constants import HELP_TEXT, EDIT_LIMITS_HELP_TEXT
 from modules.custom_print import print_error, print_ok, print_warning
-from modules.file_manager import create_needed_dirs
+from modules.file_manager import create_needed_dirs, is_super_user
 from modules.input_typing import float_input, boolean_input
 from modules.process import get_processes
 from modules.table import create_table
@@ -42,11 +39,15 @@ def edit_app_limits():
 			elif command[1] == "processes":
 				filter_str: str = ""
 				if len(command) > 2:
-					filter_str = command[1]
+					filter_str = command[2]
 				data: list[list] = [["PID", "Name"]]
 				data.extend([list(i) for i in get_processes(filter_str)])
 				print(create_table(data, [10, 20]))
 		elif command[0] == "add":
+			if not is_super_user():
+				print_error("add: you need to be root to add an app limit")
+				continue
+
 			name = input("Enter the name of the app to limit (can be a portion of)\n")
 			limit = float_input("Enter the limit for this app (in seconds)\n")
 			use_strict = boolean_input(
@@ -59,6 +60,10 @@ def edit_app_limits():
 			app_timer.write_limits_to_file()
 			print("Limit added successfully!")
 		elif command[0] == "del":
+			if not is_super_user():
+				print_error("del: you need to be root to delete an app limit")
+				continue
+
 			if len(command) < 2:
 				print_error("del: missing argument 2: `index`")
 				continue
@@ -73,6 +78,10 @@ def edit_app_limits():
 				print_error(f"del: index wasn't of type [int]")
 				continue
 		elif command[0] == "edit":
+			if not is_super_user():
+				print_error("edit: you need to be root to edit an app limit")
+				continue
+
 			if len(command) < 2:
 				print_error("edit: missing argument 2: `index`")
 				continue
@@ -164,4 +173,8 @@ if __name__ == "__main__":
 	create_needed_dirs()
 	app_timer.load_app_limits_file()
 	app_timer.load_usage_file()
-	main_screen()
+	try:
+		main_screen()
+	except KeyboardInterrupt:
+		print("\nExit signal received.")
+		exit(0)
